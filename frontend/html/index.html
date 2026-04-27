@@ -1,0 +1,37 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Microservices App</title>
+    <link rel="stylesheet" href="styles.css">
+</head>
+<body>
+
+<h1>Microservices Demo</h1>
+
+<div class="container">
+
+    <h2>Register</h2>
+    <input id="reg_user" placeholder="username">
+    <input id="reg_pass" placeholder="password" type="password">
+    <button onclick="register()">Register</button>
+
+    <h2>Login</h2>
+    <input id="log_user" placeholder="username">
+    <input id="log_pass" placeholder="password" type="password">
+    <button onclick="login()">Login</button>
+
+    <h2>Create Order</h2>
+    <input id="product" placeholder="product">
+    <input id="amount" placeholder="amount">
+    <button onclick="createOrder()">Create</button>
+
+    <h2>Your Orders</h2>
+    <button onclick="getOrders()">Load Orders</button>
+
+    <pre id="output"></pre>
+
+</div>
+
+<script src="app.js"></script>
+</body>
+</html>
