@@ -7,8 +7,8 @@ services:
     ports:
       - "80:80"
     volumes:
-      - ./frontend/nginx.conf:/etc/nginx/nginx.conf
-      - ./frontend/html:/usr/share/nginx/html
+      - ./terraform/frontend/nginx.conf:/etc/nginx/nginx.conf
+      - ./terraform/frontend/html:/usr/share/nginx/html
     depends_on:
       - auth-service
       - order-service
@@ -45,7 +45,6 @@ services:
     networks:
       - app-network
 
-
   postgres:
     image: postgres:15
     container_name: postgres
@@ -63,7 +62,7 @@ services:
       retries: 10
     volumes:
     - postgres_data:/var/lib/postgresql/data
-    - ./db-init:/docker-entrypoint-initdb.d
+    - ./terraform/db-init:/docker-entrypoint-initdb.d
     networks:
       - app-network
 
@@ -73,7 +72,7 @@ services:
     ports:
       - "9090:9090"
     volumes:
-      - ./prometheus.yml:/etc/prometheus/prometheus.yml
+      - .terraform/prometheus/prometheus.yml:/etc/prometheus/prometheus.yml
     depends_on:
       - auth-service
       - order-service
