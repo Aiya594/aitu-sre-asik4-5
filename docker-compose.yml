@@ -62,7 +62,7 @@ services:
       retries: 10
     volumes:
     - postgres_data:/var/lib/postgresql/data
-    - ./terraform/db-init:/docker-entrypoint-initdb.d
+    - ./terraform/db_init:/docker-entrypoint-initdb.d
     networks:
       - app-network
 
