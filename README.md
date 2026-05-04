@@ -105,7 +105,7 @@ After successful deployment:
 |---------|-----|---------|
 | Frontend | http://localhost:80 | Web UI |
 | Auth Service | http://localhost:8080 | Authentication API |
-| Order Service | http://localhost:8082 | Order API |
+| Order Service | http://localhost:8081 | Order API |
 | Prometheus | http://localhost:9090 | Metrics collection |
 | Grafana | http://localhost:3000 | Dashboards (admin/admin) |
 | PostgreSQL | localhost:5432 | Database (admin/admin) |

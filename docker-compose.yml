@@ -72,7 +72,7 @@ services:
     ports:
       - "9090:9090"
     volumes:
-      - .terraform/prometheus/prometheus.yml:/etc/prometheus/prometheus.yml
+      - ./terraform/prometheus/prometheus.yml:/etc/prometheus/prometheus.yml
     depends_on:
       - auth-service
       - order-service

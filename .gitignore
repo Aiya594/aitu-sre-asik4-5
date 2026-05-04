@@ -1,3 +1,7 @@
 auth-service/.env
 order-service/.env
 terraform/terraform.tfvars
+terraform/.terraform/
+terraform/*.tfstate
+terraform/*.tfstate.*
+terraform/*.tfvars

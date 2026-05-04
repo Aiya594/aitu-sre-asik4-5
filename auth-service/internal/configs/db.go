@@ -5,6 +5,7 @@ import (
 	"fmt"
 	"log"
 	"os"
+	"time"
 
 	_ "github.com/lib/pq"
 )
@@ -24,5 +25,22 @@ func NewDB() (*sql.DB, error) {
 
 	log.Print("Connecting to DB..")
 
-	return sql.Open("postgres", connStr)
+	var db *sql.DB
+
+	for i := 0; i < 10; i++ {
+		db, err := sql.Open("postgres", connStr)
+		if err == nil {
+			err = db.Ping()
+			if err == nil {
+				return db, nil
+			}
+		}
+
+		fmt.Println("DB not ready, retrying...")
+		time.Sleep(2 * time.Second)
+	}
+
+	log.Print("Connected to DB!!")
+
+	return db, nil
 }

@@ -30,6 +30,8 @@ func NewDB() (*sql.DB, error) {
 	var db *sql.DB
 	var err error
 
+	log.Print("Connecting to DB..")
+
 	for i := 0; i < 10; i++ {
 		db, err = sql.Open("postgres", connStr)
 		if err == nil {
@@ -43,7 +45,7 @@ func NewDB() (*sql.DB, error) {
 		time.Sleep(2 * time.Second)
 	}
 
-	log.Print("Connected to DB..")
+	log.Print("Connected to DB!!!")
 
 	return db, nil
 }
