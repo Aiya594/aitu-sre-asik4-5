@@ -3,34 +3,14 @@ package service
 import (
 	"log"
 
+	productclient "github.com/Aiya594/aitu-sre-asik4-5-order/internal/client"
 	"github.com/Aiya594/aitu-sre-asik4-5-order/internal/model"
 	"github.com/Aiya594/aitu-sre-asik4-5-order/internal/repository"
 )
 
 type OrderService struct {
-	Repo *repository.OrderRepository
-}
-
-func (s *OrderService) CreateOrder(userID int, product string, amount float64) error {
-	log.Printf("CreateOrder called: userID=%d product=%s amount=%.2f", userID, product, amount)
-
-	order := model.Order{
-		UserID:  userID,
-		Product: product,
-		Amount:  amount,
-	}
-
-	err := s.Repo.Create(order)
-	if err != nil {
-		log.Printf("ERROR creating order: userID=%d product=%s amount=%.2f err=%v",
-			userID, product, amount, err)
-		return err
-	}
-
-	log.Printf("Order created successfully: userID=%d product=%s amount=%.2f",
-		userID, product, amount)
-
-	return nil
+	Repo    *repository.OrderRepository
+	Product productclient.ProductClient
 }
 
 func (s *OrderService) GetOrders(userID int) ([]model.Order, error) {
@@ -45,4 +25,34 @@ func (s *OrderService) GetOrders(userID int) ([]model.Order, error) {
 	log.Printf("GetOrders success: userID=%d count=%d", userID, len(orders))
 
 	return orders, nil
+}
+
+func (s *OrderService) CreateOrder(userID int, productID int, productName string, amount float64) error {
+
+	log.Printf("[OrderService] CreateOrder user=%d productID=%d amount=%.2f", userID, productID, amount)
+
+	log.Printf("[UseCase] CreateOrder user=%d product=%d amount=%.2f", userID, productID, amount)
+
+	// 1. reserve stock FIRST (distributed transaction step)
+	err := s.Product.DecreaseStock(productID, 1)
+	if err != nil {
+		log.Printf("[UseCase][ERROR] stock reservation failed: %v", err)
+		return err
+	}
+
+	// 2. CREATE ORDER IN DB
+	order := model.Order{
+		UserID:  userID,
+		Product: productName,
+		Amount:  amount,
+	}
+
+	err = s.Repo.Create(order)
+	if err != nil {
+		log.Printf("[OrderService][ERROR] DB insert failed: %v", err)
+		return err
+	}
+
+	log.Printf("[OrderService] order created successfully for user=%d", userID)
+	return nil
 }

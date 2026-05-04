@@ -17,3 +17,7 @@ output "auth_service" {
 output "order_service" {
   value = "http://localhost:${var.services.order_port}"
 }
+
+output "product_service" {
+  value = "http://localhost:${var.services.product_port}"
+}

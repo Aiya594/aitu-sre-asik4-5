@@ -51,3 +51,11 @@ func (r *ProductRepository) GetByID(id int) (*model.Product, error) {
 
 	return &p, nil
 }
+
+func (r *ProductRepository) UpdateStock(id int, stock int) error {
+	_, err := r.DB.Exec(
+		"UPDATE products SET stock=$1 WHERE id=$2",
+		stock, id,
+	)
+	return err
+}

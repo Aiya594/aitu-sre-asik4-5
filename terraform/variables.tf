@@ -20,6 +20,7 @@ variable "services" {
   type = object({
     auth_port  = number
     order_port = number
+    product_port = number
   })
 }
 

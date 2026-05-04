@@ -10,3 +10,10 @@ CREATE TABLE orders (
     product TEXT,
     amount NUMERIC
 );
+
+CREATE TABLE products (
+    id SERIAL PRIMARY KEY,
+    name TEXT,
+    price NUMERIC,
+    stock INT
+);

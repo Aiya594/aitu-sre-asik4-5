@@ -3,6 +3,7 @@ package main
 import (
 	"os"
 
+	productclient "github.com/Aiya594/aitu-sre-asik4-5-order/internal/client"
 	"github.com/Aiya594/aitu-sre-asik4-5-order/internal/configs"
 	"github.com/Aiya594/aitu-sre-asik4-5-order/internal/handler"
 	"github.com/Aiya594/aitu-sre-asik4-5-order/internal/repository"
@@ -19,13 +20,19 @@ func main() {
 		panic(err)
 	}
 	port := os.Getenv("APP_PORT")
+
+	productUrl := os.Getenv("PRODUCT_SERVICE_UR")
+
 	database, err := configs.NewDB()
 	if err != nil {
 		panic(err)
 	}
 
 	repo := &repository.OrderRepository{DB: database}
-	svc := &service.OrderService{Repo: repo}
+
+	product := productclient.NewProductClient(productUrl)
+
+	svc := &service.OrderService{Repo: repo, Product: product}
 	h := &handler.OrderHandler{Service: svc}
 
 	r := gin.Default()
@@ -36,6 +43,10 @@ func main() {
 
 	auth := r.Group("/")
 	auth.Use(configs.AuthMiddleware())
+
+	r.GET("/health", func(c *gin.Context) {
+		c.JSON(200, gin.H{"status": "auth ok"})
+	})
 
 	auth.POST("/order", h.Create)
 	auth.GET("/orders", h.GetOrders)

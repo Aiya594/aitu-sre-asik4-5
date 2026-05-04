@@ -91,3 +91,22 @@ func (s *ProductService) GetProduct(id int) (*model.Product, error) {
 	log.Printf("[ProductService] product retrieved: id=%d name=%s", id, product.Name)
 	return product, nil
 }
+
+func (s *ProductService) DecreaseStock(id int, amount int) error {
+
+	log.Printf("[ProductService] DecreaseStock: id=%d amount=%d", id, amount)
+
+	product, err := s.Repo.GetByID(id)
+	if err != nil {
+		return err
+	}
+
+	if product.Stock < amount {
+		log.Printf("[ProductService][ERROR] insufficient stock: id=%d", id)
+		return errors.New("insufficient stock")
+	}
+
+	newStock := product.Stock - amount
+
+	return s.Repo.UpdateStock(id, newStock)
+}

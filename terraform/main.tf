@@ -93,6 +93,34 @@ resource "docker_container" "order" {
 }
 
 # =========================
+# PRODUCT SERVICE
+# =========================
+resource "docker_container" "auth" {
+  name  = "product-service"
+  image = "product-service:latest"
+
+  env = [
+    "DB_HOST=${var.database.host}",
+    "DB_USER=${var.database.user}",
+    "DB_PASSWORD=${var.database.password}",
+    "DB_NAME=${var.database.name}",
+    "DB_MODE=${var.database.mode}",
+    "DB_PORT=${var.database.port}"
+  ]
+
+  ports {
+    internal = var.services.product_port
+    external = var.services.product_port
+  }
+
+  networks_advanced {
+    name = docker_network.app_network.name
+  }
+
+  depends_on = [docker_container.postgres]
+}
+
+# =========================
 # PROMETHEUS
 # =========================
 resource "docker_container" "prometheus" {

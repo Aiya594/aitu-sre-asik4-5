@@ -11,15 +11,16 @@ type OrderHandler struct {
 
 func (h *OrderHandler) Create(c *gin.Context) {
 	var req struct {
-		Product string  `json:"product"`
-		Amount  float64 `json:"amount"`
+		ProductID   int     `json:"product_id"`
+		ProductName string  `json:"product_name"`
+		Amount      float64 `json:"amount"`
 	}
 
 	c.BindJSON(&req)
 
 	userID := c.GetInt("user_id")
 
-	err := h.Service.CreateOrder(userID, req.Product, req.Amount)
+	err := h.Service.CreateOrder(userID, req.ProductID, req.ProductName, req.Amount)
 	if err != nil {
 		c.JSON(500, gin.H{"error": err.Error()})
 		return

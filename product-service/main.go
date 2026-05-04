@@ -38,6 +38,7 @@ func main() {
 	r.POST("/products", h.Create)
 	r.GET("/products", h.GetAll)
 	r.GET("/products/:id", h.GetByID)
+	r.PUT("/products/:id/decrease-stock", h.DecreaseStock)
 
 	r.GET("/metrics", gin.WrapH(promhttp.Handler()))
 

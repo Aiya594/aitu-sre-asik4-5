@@ -50,3 +50,35 @@ func (h *ProductHandler) GetByID(c *gin.Context) {
 
 	c.JSON(200, product)
 }
+
+func (h *ProductHandler) DecreaseStock(c *gin.Context) {
+	id, _ := strconv.Atoi(c.Param("id"))
+
+	var req struct {
+		Amount int `json:"amount"`
+	}
+
+	if err := c.BindJSON(&req); err != nil {
+		c.JSON(400, gin.H{"error": "invalid request"})
+		return
+	}
+
+	product, err := h.Service.GetProduct(id)
+	if err != nil {
+		c.JSON(404, gin.H{"error": "product not found"})
+		return
+	}
+
+	if product.Stock < req.Amount {
+		c.JSON(400, gin.H{"error": "not enough stock"})
+		return
+	}
+
+	err = h.Service.DecreaseStock(id, req.Amount)
+	if err != nil {
+		c.JSON(500, gin.H{"error": "failed to update stock"})
+		return
+	}
+
+	c.JSON(200, gin.H{"status": "stock updated"})
+}
