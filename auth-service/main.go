@@ -1,6 +1,8 @@
 package main
 
 import (
+	"os"
+
 	"github.com/Aiya594/aitu-sre-asik4-5-auth/internal/configs"
 	"github.com/Aiya594/aitu-sre-asik4-5-auth/internal/handler"
 	"github.com/Aiya594/aitu-sre-asik4-5-auth/internal/repository"
@@ -13,7 +15,7 @@ import (
 func main() {
 	_ = godotenv.Load(".env")
 
-	//port := os.Getenv("APP_PORT")
+	port := os.Getenv("APP_PORT")
 
 	database, err := configs.NewDB()
 	if err != nil {
@@ -35,5 +37,5 @@ func main() {
 
 	r.GET("/metrics", gin.WrapH(promhttp.Handler()))
 
-	r.Run(":8080")
+	r.Run(":" + port)
 }

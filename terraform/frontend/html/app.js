@@ -5,7 +5,8 @@ function log(data) {
         JSON.stringify(data, null, 2);
 }
 
-// REGISTER
+//AUTH
+
 async function register() {
     const username = document.getElementById("reg_user").value;
     const password = document.getElementById("reg_pass").value;
@@ -16,11 +17,9 @@ async function register() {
         body: JSON.stringify({ username, password })
     });
 
-    const data = await res.json();
-    log(data);
+    log(await res.json());
 }
 
-// LOGIN
 async function login() {
     const username = document.getElementById("log_user").value;
     const password = document.getElementById("log_pass").value;
@@ -41,7 +40,31 @@ async function login() {
     log(data);
 }
 
-// CREATE ORDER
+//PRODUCTS
+
+async function createProduct() {
+    const name = document.getElementById("p_name").value;
+    const price = parseFloat(document.getElementById("p_price").value);
+    const stock = parseInt(document.getElementById("p_stock").value);
+
+    const res = await fetch("/products/products", {
+        method: "POST",
+        headers: {
+            "Content-Type": "application/json"
+        },
+        body: JSON.stringify({ name, price, stock })
+    });
+
+    log(await res.json());
+}
+
+async function getProducts() {
+    const res = await fetch("/products/products");
+    log(await res.json());
+}
+
+//ORDERS
+
 async function createOrder() {
     const product = document.getElementById("product").value;
     const amount = parseFloat(document.getElementById("amount").value);
@@ -55,11 +78,9 @@ async function createOrder() {
         body: JSON.stringify({ product, amount })
     });
 
-    const data = await res.json();
-    log(data);
+    log(await res.json());
 }
 
-// GET ORDERS
 async function getOrders() {
     const res = await fetch("/orders/orders", {
         headers: {
@@ -67,6 +88,5 @@ async function getOrders() {
         }
     });
 
-    const data = await res.json();
-    log(data);
+    log(await res.json());
 }

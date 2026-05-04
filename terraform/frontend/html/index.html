@@ -1,37 +1,64 @@
 <!DOCTYPE html>
-<html>
+<html lang="en">
 <head>
-    <title>Microservices App</title>
+    <meta charset="UTF-8" />
+    <title>Microservices Dashboard</title>
     <link rel="stylesheet" href="styles.css">
 </head>
+
 <body>
 
-<h1>Microservices Demo</h1>
+<h1>Microservices System Dashboard</h1>
 
 <div class="container">
 
-    <h2>Register</h2>
-    <input id="reg_user" placeholder="username">
-    <input id="reg_pass" placeholder="password" type="password">
-    <button onclick="register()">Register</button>
+    <!-- AUTH -->
+    <div class="card">
+        <h2>Auth Service</h2>
 
-    <h2>Login</h2>
-    <input id="log_user" placeholder="username">
-    <input id="log_pass" placeholder="password" type="password">
-    <button onclick="login()">Login</button>
+        <input id="reg_user" placeholder="Register username" />
+        <input id="reg_pass" type="password" placeholder="Register password" />
+        <button onclick="register()">Register</button>
 
-    <h2>Create Order</h2>
-    <input id="product" placeholder="product">
-    <input id="amount" placeholder="amount">
-    <button onclick="createOrder()">Create</button>
+        <hr>
 
-    <h2>Your Orders</h2>
-    <button onclick="getOrders()">Load Orders</button>
+        <input id="log_user" placeholder="Login username" />
+        <input id="log_pass" type="password" placeholder="Login password" />
+        <button onclick="login()">Login</button>
+    </div>
 
-    <pre id="output"></pre>
+    <!-- PRODUCTS -->
+    <div class="card">
+        <h2>Product Service</h2>
+
+        <input id="p_name" placeholder="Product name" />
+        <input id="p_price" placeholder="Price" />
+        <input id="p_stock" placeholder="Stock" />
+
+        <button onclick="createProduct()">Create Product</button>
+        <button onclick="getProducts()">Get Products</button>
+    </div>
+
+    <!-- ORDERS -->
+    <div class="card">
+        <h2>Order Service</h2>
+
+        <input id="product" placeholder="Product name" />
+        <input id="amount" placeholder="Amount" />
+
+        <button onclick="createOrder()">Create Order</button>
+        <button onclick="getOrders()">Get Orders</button>
+    </div>
 
 </div>
 
+<!-- OUTPUT -->
+<div class="output">
+    <h2>Response</h2>
+    <pre id="output"></pre>
+</div>
+
 <script src="app.js"></script>
+
 </body>
 </html>
