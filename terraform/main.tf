@@ -10,7 +10,7 @@ terraform {
 provider "docker" {}
 
 resource "docker_network" "app_network" {
-  name = "microservices_network"
+  name = var.network.name
 }
 
 # =========================
@@ -21,9 +21,9 @@ resource "docker_container" "postgres" {
   image = "postgres:15"
 
   env = [
-    "POSTGRES_USER=admin",
-    "POSTGRES_PASSWORD=admin",
-    "POSTGRES_DB=app"
+    "POSTGRES_USER=${var.database.user}",
+    "POSTGRES_PASSWORD=${var.database.password}",
+    "POSTGRES_DB=${var.database.name}"
   ]
 
   volumes {
@@ -44,17 +44,17 @@ resource "docker_container" "auth" {
   image = "auth-service:latest"
 
   env = [
-    "DB_HOST=postgres",
-    "DB_USER=admin",
-    "DB_PASSWORD=admin",
-    "DB_NAME=app",
-    "DB_MODE=disable",
-    "DB_PORT=5432"
+    "DB_HOST=${var.database.host}",
+    "DB_USER=${var.database.user}",
+    "DB_PASSWORD=${var.database.password}",
+    "DB_NAME=${var.database.name}",
+    "DB_MODE=${var.database.mode}",
+    "DB_PORT=${var.database.port}"
   ]
 
   ports {
-    internal = 8080
-    external = 8080
+    internal = var.services.auth_port
+    external = var.services.auth_port
   }
 
   networks_advanced {
@@ -72,17 +72,17 @@ resource "docker_container" "order" {
   image = "order-service:latest"
 
   env = [
-    "DB_HOST=postgres",
-    "DB_USER=admin",
-    "DB_PASSWORD=admin",
-    "DB_NAME=app",
-    "DB_MODE=disable",
-    "DB_PORT=5432"
+    "DB_HOST=${var.database.host}",
+    "DB_USER=${var.database.user}",
+    "DB_PASSWORD=${var.database.password}",
+    "DB_NAME=${var.database.name}",
+    "DB_MODE=${var.database.mode}",
+    "DB_PORT=${var.database.port}"
   ]
 
   ports {
-    internal = 8082
-    external = 8082
+    internal = var.services.order_port
+    external = var.services.order_port
   }
 
   networks_advanced {
@@ -100,8 +100,8 @@ resource "docker_container" "prometheus" {
   image = "prom/prometheus"
 
   ports {
-    internal = 9090
-    external = 9090
+    internal = var.observability.prometheus_port
+    external = var.observability.prometheus_port
   }
 
   volumes {
@@ -122,8 +122,8 @@ resource "docker_container" "grafana" {
   image = "grafana/grafana"
 
   ports {
-    internal = 3000
-    external = 3000
+    internal = var.observability.grafana_port
+    external = var.observability.grafana_port
   }
 
   networks_advanced {
@@ -135,12 +135,12 @@ resource "docker_container" "grafana" {
 # FRONTEND (NGINX)
 # =========================
 resource "docker_container" "nginx" {
-  name  = "frontend"
+  name  = "${var.project_name}-frontend"
   image = "nginx:latest"
 
   ports {
-    internal = 80
-    external = 80
+    internal = var.nginx_port
+    external = var.nginx_port
   }
 
   volumes {

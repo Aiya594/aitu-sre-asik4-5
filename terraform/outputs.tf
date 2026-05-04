@@ -1,19 +1,19 @@
 output "frontend_url" {
-  value = "http://localhost:80"
+  value = "http://localhost:${var.nginx_port}"
 }
 
 output "grafana_url" {
-  value = "http://localhost:3000"
+  value = "http://localhost:${var.observability.grafana_port}"
 }
 
 output "prometheus_url" {
-  value = "http://localhost:9090"
+  value = "http://localhost:${var.observability.prometheus_port}"
 }
 
 output "auth_service" {
-  value = "http://localhost:8080"
+  value = "http://localhost:${var.services.auth_port}"
 }
 
 output "order_service" {
-  value = "http://localhost:8081"
+  value = "http://localhost:${var.services.order_port}"
 }

@@ -74,7 +74,7 @@ When running with defaults (no custom terraform.tfvars):
 | Database Name | app |
 | Nginx Port | 80 |
 | Auth Service Port | 8080 |
-| Order Service Port | 8082 |
+| Order Service Port | 8081 |
 | Prometheus Port | 9090 |
 | Grafana Port | 3000 |
 | Environment | dev |
