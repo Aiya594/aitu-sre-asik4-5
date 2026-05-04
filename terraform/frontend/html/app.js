@@ -67,7 +67,7 @@ async function createProduct() {
         const price = parseFloat(document.getElementById("p_price").value);
         const stock = parseInt(document.getElementById("p_stock").value);
 
-        const res = await fetch(`${API.products}/products`, {
+        const res = await fetch(`${API.products}/product`, {
             method: "POST",
             headers: {
                 "Content-Type": "application/json"

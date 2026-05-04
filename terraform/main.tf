@@ -77,7 +77,8 @@ resource "docker_container" "order" {
     "DB_PASSWORD=${var.database.password}",
     "DB_NAME=${var.database.name}",
     "DB_MODE=${var.database.mode}",
-    "DB_PORT=${var.database.port}"
+    "DB_PORT=${var.database.port}",
+    "PRODUCT_SERVICE_URL=http://product-service:8082"
   ]
 
   ports {
@@ -95,7 +96,7 @@ resource "docker_container" "order" {
 # =========================
 # PRODUCT SERVICE
 # =========================
-resource "docker_container" "auth" {
+resource "docker_container" "product" {
   name  = "product-service"
   image = "product-service:latest"
 
