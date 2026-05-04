@@ -19,6 +19,9 @@ func main() {
 	// }
 
 	port := os.Getenv("APP_PORT")
+	if port == "" {
+		port = "8082"
+	}
 
 	database, err := config.NewDB()
 	if err != nil {
@@ -35,7 +38,7 @@ func main() {
 		c.JSON(200, gin.H{"status": "product ok"})
 	})
 
-	r.POST("/products", h.Create)
+	r.POST("/product", h.Create)
 	r.GET("/products", h.GetAll)
 	r.GET("/products/:id", h.GetByID)
 	r.PUT("/products/:id/decrease-stock", h.DecreaseStock)

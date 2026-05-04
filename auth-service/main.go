@@ -16,6 +16,9 @@ func main() {
 	_ = godotenv.Load(".env")
 
 	port := os.Getenv("APP_PORT")
+	if port == "" {
+		port = "8080"
+	}
 
 	database, err := configs.NewDB()
 	if err != nil {

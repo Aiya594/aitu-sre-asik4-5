@@ -20,6 +20,9 @@ func main() {
 	// 	panic(err)
 	// }
 	port := os.Getenv("APP_PORT")
+	if port == "" {
+		port = "8081"
+	}
 
 	productUrl := os.Getenv("PRODUCT_SERVICE_URL")
 

@@ -1,3 +1,4 @@
+.env
 auth-service/.env
 order-service/.env
 product-service/.env
