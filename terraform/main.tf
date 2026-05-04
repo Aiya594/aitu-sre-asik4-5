@@ -40,6 +40,8 @@ resource "docker_container" "postgres" {
 # AUTH SERVICE
 # =========================
 resource "docker_container" "auth" {
+  count=var.scaling.auth_replicas
+
   name  = "auth-service"
   image = "auth-service:latest"
 
@@ -68,6 +70,9 @@ resource "docker_container" "auth" {
 # ORDER SERVICE
 # =========================
 resource "docker_container" "order" {
+  count=var.scaling.order_replicas
+
+
   name  = "order-service"
   image = "order-service:latest"
 
@@ -97,6 +102,9 @@ resource "docker_container" "order" {
 # PRODUCT SERVICE
 # =========================
 resource "docker_container" "product" {
+  count=var.scaling.product_replicas
+
+
   name  = "product-service"
   image = "product-service:latest"
 

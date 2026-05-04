@@ -176,6 +176,138 @@ SERVICE_PORT=8002
 
 ---
 
+## Assignment 6: Automation in SRE and Capacity Planning
+
+### Automation Mechanisms
+
+#### 1. Automated Deployment
+- **Docker Compose**: Consistent multi-container deployment
+- **Terraform Integration**: Infrastructure provisioning
+- **Environment Configuration**: Standardized `.env` files with validation
+
+#### 2. Health Checks and Self-Healing
+- **HTTP Health Endpoints**: `/health` for all services
+- **Docker Health Checks**: Automatic container health verification
+- **Restart Policies**: `restart: unless-stopped` for automatic recovery
+
+#### 3. Monitoring-Based Alerting
+- **Prometheus Metrics**: CPU, memory, request rates, error rates
+- **Alert Rules**: Configured in `terraform/prometheus/alerts.yml`
+  - High CPU usage (>80%)
+  - Service downtime
+  - High error rates (>10%)
+  - Container restarts
+
+#### 4. Configuration Validation
+- **Pre-deployment Checks**: `validate_env.sh` script validates environment variables
+- **Template-based Configs**: `.env.example` files for consistent setup
+
+#### 5. Log-Based Troubleshooting
+- **Centralized Logging**: Container logs accessible via `docker-compose logs`
+- **Automated Patterns**: Database connection failures, service restarts
+
+### Capacity Planning
+
+#### Metrics Collection
+- **CPU Usage**: Monitored via Prometheus
+- **Memory Utilization**: Container resource tracking
+- **Request Rate (RPS)**: API call frequency
+- **Error Rate**: Failure percentage monitoring
+- **Container Restarts**: Reliability indicators
+
+#### Load Simulation
+- **Load Testing Script**: `load_test.sh` for concurrent request simulation
+- **Stress Testing**: CPU and API load generation
+- **Performance Monitoring**: Response time and throughput analysis
+
+#### Capacity Analysis
+- **Order Service**: Identified as most resource-intensive component
+- **Database Bottlenecks**: Connection pooling and query optimization needed
+- **Scaling Thresholds**: Maximum sustainable request rates under load
+
+#### Scaling Strategies
+
+##### Horizontal Scaling
+- **Replicas** were added via Terraform
+- **Load Balancing**: Nginx configuration for request distribution
+- **Service Discovery**: Container networking for inter-service communication
+
+##### Vertical Scaling
+- **Resource Allocation**: Increased CPU/memory limits in Docker configs
+- **VM Upgrades**: Terraform variables for infrastructure scaling
+
+##### Database Optimization
+- **Connection Pooling**: Efficient database connection management
+- **Query Optimization**: Performance tuning for high-load scenarios
+- **Resource Tuning**: PostgreSQL configuration optimization
+
+#### Auto-Scaling Considerations
+- **Metric-based Scaling**: CPU threshold triggers (proposed)
+- **Orchestration Integration**: Kubernetes readiness for production scaling
+- **Policy-based Automation**: Declarative scaling rules
+
+### Usage
+
+#### Standard Deployment
+```bash
+# Validate configuration
+./validate_env.sh
+
+# Deploy services
+docker-compose up -d
+
+# Check health
+curl http://localhost:8080/health
+curl http://localhost:8081/health
+curl http://localhost:8082/health
+```
+
+#### Scaled Deployment
+```bash
+# Deploy with multiple order service instances
+docker-compose -f docker-compose.scaled.yml up -d
+```
+
+#### Load Testing
+```bash
+# Run load simulation
+./load_test.sh
+
+# Monitor in Grafana: http://localhost:3000
+# Check alerts in Prometheus: http://localhost:9090/alerts
+```
+
+#### Monitoring
+- **Prometheus**: http://localhost:9090
+- **Grafana**: http://localhost:3000 (admin/admin)
+- **Alert Rules**: View configured alerts and their status
+
+### Deliverables for Assignment 6
+
+#### Updated Source Code
+- **Services**: Health checks (`/health`), metrics (`/metrics`), improved configuration
+- **Docker Configuration**: Enhanced `docker-compose.yml` with restart policies and health checks
+- **Scaled Configuration**: `docker-compose.scaled.yml` for horizontal scaling demonstration
+
+#### Monitoring Configuration
+- **Prometheus**: Alert rules in `terraform/prometheus/alerts.yml`
+- **Metrics Collection**: CPU, memory, request rates, error rates, restart frequency
+
+#### Automation Scripts
+- **Configuration Validation**: `validate_env.sh` for pre-deployment checks
+- **Load Testing**: `load_test.sh` for capacity analysis simulation
+
+#### Infrastructure Updates
+- **Terraform**: Scaling variables in `variables.tf` for replica configuration
+- **Network Configuration**: Updated for multiple service instances
+
+#### Documentation
+- **Automation Mechanisms**: Deployment, monitoring, alerting, validation processes
+- **Capacity Planning**: Load simulation, scaling strategies, performance analysis
+- **Operational Procedures**: Health checks, troubleshooting, scaling procedures
+
+---
+
 ## Infrastructure
 
 ### Docker Compose

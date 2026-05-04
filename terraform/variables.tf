@@ -46,3 +46,17 @@ variable "network" {
     name = "microservices-network"
   }
 }
+
+# Scaling configuration
+variable "scaling" {
+  type = object({
+    auth_replicas    = number
+    order_replicas   = number
+    product_replicas = number
+  })
+  default = {
+    auth_replicas    = 1
+    order_replicas   = 2  # Order service is resource-intensive
+    product_replicas = 1
+  }
+}
