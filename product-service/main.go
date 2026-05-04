@@ -13,11 +13,11 @@ import (
 )
 
 func main() {
-	err := godotenv.Load(".env")
+	_ = godotenv.Load(".env")
+	// if err != nil {
+	// 	panic(err)
+	// }
 
-	if err != nil {
-		panic(err)
-	}
 	port := os.Getenv("APP_PORT")
 
 	database, err := config.NewDB()

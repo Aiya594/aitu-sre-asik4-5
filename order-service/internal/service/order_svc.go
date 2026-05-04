@@ -34,7 +34,7 @@ func (s *OrderService) CreateOrder(userID int, productID int, productName string
 	log.Printf("[UseCase] CreateOrder user=%d product=%d amount=%.2f", userID, productID, amount)
 
 	// 1. reserve stock FIRST (distributed transaction step)
-	err := s.Product.DecreaseStock(productID, 1)
+	err := s.Product.DecreaseStock(productID, int(amount))
 	if err != nil {
 		log.Printf("[UseCase][ERROR] stock reservation failed: %v", err)
 		return err

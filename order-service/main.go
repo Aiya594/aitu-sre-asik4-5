@@ -14,14 +14,14 @@ import (
 )
 
 func main() {
-	err := godotenv.Load(".env")
+	_ = godotenv.Load(".env")
 
-	if err != nil {
-		panic(err)
-	}
+	// if err != nil {
+	// 	panic(err)
+	// }
 	port := os.Getenv("APP_PORT")
 
-	productUrl := os.Getenv("PRODUCT_SERVICE_UR")
+	productUrl := os.Getenv("PRODUCT_SERVICE_URL")
 
 	database, err := configs.NewDB()
 	if err != nil {
@@ -43,10 +43,6 @@ func main() {
 
 	auth := r.Group("/")
 	auth.Use(configs.AuthMiddleware())
-
-	r.GET("/health", func(c *gin.Context) {
-		c.JSON(200, gin.H{"status": "auth ok"})
-	})
 
 	auth.POST("/order", h.Create)
 	auth.GET("/orders", h.GetOrders)

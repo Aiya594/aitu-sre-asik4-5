@@ -1,34 +1,32 @@
-<!DOCTYPE html>
+<!doctype html>
 <html lang="en">
-<head>
+  <head>
     <meta charset="UTF-8" />
     <title>Microservices Dashboard</title>
-    <link rel="stylesheet" href="styles.css">
-</head>
+    <link rel="stylesheet" href="styles.css" />
+  </head>
 
-<body>
+  <body>
+    <h1>Microservices System Dashboard</h1>
 
-<h1>Microservices System Dashboard</h1>
-
-<div class="container">
-
-    <!-- AUTH -->
-    <div class="card">
+    <div class="container">
+      <!-- AUTH -->
+      <div class="card">
         <h2>Auth Service</h2>
 
         <input id="reg_user" placeholder="Register username" />
         <input id="reg_pass" type="password" placeholder="Register password" />
         <button onclick="register()">Register</button>
 
-        <hr>
+        <hr />
 
         <input id="log_user" placeholder="Login username" />
         <input id="log_pass" type="password" placeholder="Login password" />
         <button onclick="login()">Login</button>
-    </div>
+      </div>
 
-    <!-- PRODUCTS -->
-    <div class="card">
+      <!-- PRODUCTS -->
+      <div class="card">
         <h2>Product Service</h2>
 
         <input id="p_name" placeholder="Product name" />
@@ -37,28 +35,27 @@
 
         <button onclick="createProduct()">Create Product</button>
         <button onclick="getProducts()">Get Products</button>
-    </div>
+      </div>
 
-    <!-- ORDERS -->
-    <div class="card">
+      <!-- ORDERS -->
+      <!-- ORDERS -->
+      <div class="card">
         <h2>Order Service</h2>
 
-        <input id="product" placeholder="Product name" />
+        <input id="product_id" placeholder="Product ID (NOT name)" />
         <input id="amount" placeholder="Amount" />
 
         <button onclick="createOrder()">Create Order</button>
         <button onclick="getOrders()">Get Orders</button>
+      </div>
     </div>
 
-</div>
+    <!-- OUTPUT -->
+    <div class="output">
+      <h2>Response</h2>
+      <pre id="output"></pre>
+    </div>
 
-<!-- OUTPUT -->
-<div class="output">
-    <h2>Response</h2>
-    <pre id="output"></pre>
-</div>
-
-<script src="app.js"></script>
-
-</body>
+    <script src="app.js"></script>
+  </body>
 </html>
