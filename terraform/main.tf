@@ -27,7 +27,7 @@ resource "docker_container" "postgres" {
   ]
 
   volumes {
-    host_path      = abspath("${path.module}/db_init")
+    host_path      = abspath("${path.module}/../db_init")
     container_path = "/docker-entrypoint-initdb.d"
   }
 
@@ -142,7 +142,7 @@ resource "docker_container" "prometheus" {
   }
 
   volumes {
-    host_path      = abspath("${path.module}/prometheus/prometheus.yml")
+    host_path      = abspath("${path.module}/../prometheus/prometheus.yml")
     container_path = "/etc/prometheus/prometheus.yml"
   }
 
@@ -172,7 +172,7 @@ resource "docker_container" "grafana" {
 # FRONTEND (NGINX)
 # =========================
 resource "docker_container" "nginx" {
-  name  = "${var.project_name}-frontend"
+  name  = "frontend"
   image = "nginx:latest"
 
   ports {
@@ -181,12 +181,12 @@ resource "docker_container" "nginx" {
   }
 
   volumes {
-    host_path      = abspath("${path.module}/frontend/html")
+    host_path      = abspath("${path.module}/../frontend/html")
     container_path = "/usr/share/nginx/html"
   }
 
   volumes {
-    host_path      = abspath("${path.module}/frontend/nginx.conf")
+    host_path      = abspath("${path.module}/../frontend/nginx.conf")
     container_path = "/etc/nginx/nginx.conf"
   }
 
