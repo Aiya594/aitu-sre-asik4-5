@@ -18,7 +18,7 @@ func main() {
 	// 	panic(err)
 	// }
 
-	port := os.Getenv("APP_PORT")
+	port := os.Getenv("PAYMENT_SERVICE_PORT")
 	if port == "" {
 		port = "8083"
 	}

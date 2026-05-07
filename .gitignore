@@ -2,6 +2,7 @@
 auth-service/.env
 order-service/.env
 product-service/.env
+payment-service/.env
 
 terraform/terraform.tfvars
 terraform/.terraform/
