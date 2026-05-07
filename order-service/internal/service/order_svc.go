@@ -3,14 +3,16 @@ package service
 import (
 	"log"
 
-	productclient "github.com/Aiya594/aitu-sre-asik4-5-order/internal/client"
+	"github.com/Aiya594/aitu-sre-asik4-5-order/internal/client"
 	"github.com/Aiya594/aitu-sre-asik4-5-order/internal/model"
 	"github.com/Aiya594/aitu-sre-asik4-5-order/internal/repository"
+	"github.com/google/uuid"
 )
 
 type OrderService struct {
 	Repo    *repository.OrderRepository
-	Product productclient.ProductClient
+	Product client.ProductClient
+	Payment client.PaymentClient
 }
 
 func (s *OrderService) GetOrders(userID int) ([]model.Order, error) {
@@ -33,8 +35,24 @@ func (s *OrderService) CreateOrder(userID int, productID int, productName string
 
 	log.Printf("[UseCase] CreateOrder user=%d product=%d amount=%.2f", userID, productID, amount)
 
+	orderID := uuid.New().String()
+	err := s.Payment.ProcessPayment(
+		orderID,
+		userID,
+		amount,
+	)
+
+	if err != nil {
+		log.Printf(
+			"[OrderService][ERROR] payment failed: %v",
+			err,
+		)
+
+		return err
+	}
+
 	// 1. reserve stock FIRST (distributed transaction step)
-	err := s.Product.DecreaseStock(productID, int(amount))
+	err = s.Product.DecreaseStock(productID, int(amount))
 	if err != nil {
 		log.Printf("[UseCase][ERROR] stock reservation failed: %v", err)
 		return err
@@ -42,6 +60,7 @@ func (s *OrderService) CreateOrder(userID int, productID int, productName string
 
 	// 2. CREATE ORDER IN DB
 	order := model.Order{
+		ID:      orderID,
 		UserID:  userID,
 		Product: productName,
 		Amount:  amount,

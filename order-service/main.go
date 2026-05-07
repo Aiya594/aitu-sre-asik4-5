@@ -3,7 +3,7 @@ package main
 import (
 	"os"
 
-	productclient "github.com/Aiya594/aitu-sre-asik4-5-order/internal/client"
+	"github.com/Aiya594/aitu-sre-asik4-5-order/internal/client"
 	"github.com/Aiya594/aitu-sre-asik4-5-order/internal/configs"
 	"github.com/Aiya594/aitu-sre-asik4-5-order/internal/handler"
 	"github.com/Aiya594/aitu-sre-asik4-5-order/internal/repository"
@@ -25,6 +25,7 @@ func main() {
 	}
 
 	productUrl := os.Getenv("PRODUCT_SERVICE_URL")
+	paymentURL := os.Getenv("PAYMENT_SERVICE_URL")
 
 	database, err := configs.NewDB()
 	if err != nil {
@@ -33,9 +34,15 @@ func main() {
 
 	repo := &repository.OrderRepository{DB: database}
 
-	product := productclient.NewProductClient(productUrl)
+	product := client.NewProductClient(productUrl)
+	payment := client.NewPaymentClient(paymentURL)
 
-	svc := &service.OrderService{Repo: repo, Product: product}
+	svc := &service.OrderService{
+		Repo:    repo,
+		Product: product,
+		Payment: payment,
+	}
+
 	h := &handler.OrderHandler{Service: svc}
 
 	r := gin.Default()

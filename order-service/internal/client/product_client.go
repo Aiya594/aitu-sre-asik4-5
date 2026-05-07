@@ -1,4 +1,4 @@
-package productclient
+package client
 
 import (
 	"bytes"
