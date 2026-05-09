@@ -3,6 +3,7 @@ package service
 import (
 	"log"
 
+	"github.com/Aiya594/aitu-sre-asik4-5-order/internal/broker"
 	"github.com/Aiya594/aitu-sre-asik4-5-order/internal/client"
 	"github.com/Aiya594/aitu-sre-asik4-5-order/internal/model"
 	"github.com/Aiya594/aitu-sre-asik4-5-order/internal/repository"
@@ -10,9 +11,10 @@ import (
 )
 
 type OrderService struct {
-	Repo    *repository.OrderRepository
-	Product client.ProductClient
-	Payment client.PaymentClient
+	Repo      *repository.OrderRepository
+	Product   client.ProductClient
+	Payment   client.PaymentClient
+	Publisher *broker.Publisher
 }
 
 func (s *OrderService) GetOrders(userID int) ([]model.Order, error) {
@@ -70,6 +72,21 @@ func (s *OrderService) CreateOrder(userID int, productID int, productName string
 	if err != nil {
 		log.Printf("[OrderService][ERROR] DB insert failed: %v", err)
 		return err
+	}
+
+	err = s.Publisher.PublishOrderCreated(
+		broker.NotificationEvent{
+			UserID:  userID,
+			Message: "Your order was created successfully",
+			Type:    "email",
+		},
+	)
+
+	if err != nil {
+
+		log.Printf(
+			"[OrderService][WARN] failed to publish notification",
+		)
 	}
 
 	log.Printf("[OrderService] order created successfully for user=%d", userID)

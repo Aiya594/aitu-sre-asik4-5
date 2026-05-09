@@ -3,6 +3,7 @@ package main
 import (
 	"os"
 
+	"github.com/Aiya594/aitu-sre-asik4-5-order/internal/broker"
 	"github.com/Aiya594/aitu-sre-asik4-5-order/internal/client"
 	"github.com/Aiya594/aitu-sre-asik4-5-order/internal/configs"
 	"github.com/Aiya594/aitu-sre-asik4-5-order/internal/handler"
@@ -11,6 +12,7 @@ import (
 	"github.com/gin-gonic/gin"
 	"github.com/joho/godotenv"
 	"github.com/prometheus/client_golang/prometheus/promhttp"
+	"github.com/rabbitmq/amqp091-go"
 )
 
 func main() {
@@ -26,6 +28,7 @@ func main() {
 
 	productUrl := os.Getenv("PRODUCT_SERVICE_URL")
 	paymentURL := os.Getenv("PAYMENT_SERVICE_URL")
+	rabbitURL := os.Getenv("RABBITMQ_URL")
 
 	database, err := configs.NewDB()
 	if err != nil {
@@ -37,10 +40,52 @@ func main() {
 	product := client.NewProductClient(productUrl)
 	payment := client.NewPaymentClient(paymentURL)
 
+	conn, err := amqp091.Dial(rabbitURL)
+
+	if err != nil {
+		panic(err)
+	}
+
+	defer conn.Close()
+
+	ch, err := conn.Channel()
+
+	if err != nil {
+		panic(err)
+	}
+
+	defer ch.Close()
+
+	_, err = ch.QueueDeclare(
+		"order_created",
+		true,
+		false,
+		false,
+		false,
+		nil,
+	)
+
+	if err != nil {
+		panic(err)
+	}
+
+	/*
+		PUBLISHER
+	*/
+
+	publisher := &broker.Publisher{
+		Channel: ch,
+	}
+
+	/*
+		SERVICE
+	*/
+
 	svc := &service.OrderService{
-		Repo:    repo,
-		Product: product,
-		Payment: payment,
+		Repo:      repo,
+		Product:   product,
+		Payment:   payment,
+		Publisher: publisher,
 	}
 
 	h := &handler.OrderHandler{Service: svc}
