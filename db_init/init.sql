@@ -25,3 +25,11 @@ CREATE TABLE payments (
     amount DECIMAL(10,2) NOT NULL,
     status VARCHAR(50) NOT NULL
 );
+
+CREATE TABLE user_profiles (
+    id SERIAL PRIMARY KEY,
+    user_id INT UNIQUE NOT NULL,
+    email VARCHAR(255) NOT NULL,
+    phone VARCHAR(100),
+    address TEXT
+);
