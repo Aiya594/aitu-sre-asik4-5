@@ -13,6 +13,8 @@ services:
       - auth-service
       - order-service
       - product-service
+      - payment-service
+      - profile-service
     networks:
       - app-network
     restart: unless-stopped
@@ -86,6 +88,33 @@ services:
     networks:
       - app-network
     restart: unless-stopped
+
+  notification-service:
+    build: ./notification-service
+    container_name: notification-service
+    ports:
+      - "${NOTIFICATION_SERVICE_PORT}:8084"
+    env_file:
+      - ./notification-service/.env
+    environment:
+      DB_HOST: postgres
+      DB_USER: ${DB_USER}
+      DB_PASSWORD: ${DB_PASSWORD}
+      DB_NAME: notificationdb
+      DB_PORT: ${DB_PORT}
+      RABBITMQ_URL: ${RABBIT_MQ_URL}
+    depends_on:
+      postgres:
+        condition: service_healthy
+      rabbitmq:
+        condition: service_started
+    healthcheck:
+      test: ["CMD", "wget", "--spider", "http://notification-service:8084/health"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+    networks:
+      - app-network
 
   order-service:
     build: ./order-service
@@ -191,6 +220,8 @@ services:
     ports:
       - "5672:5672"
       - "15672:15672"
+    networks:
+      - app-network
 
 networks:
   app-network:

@@ -20,7 +20,14 @@ func AuthMiddleware() gin.HandlerFunc {
 			return
 		}
 
-		tokenString := strings.Split(auth, " ")[1]
+		parts := strings.Fields(auth)
+		if len(parts) != 2 || strings.ToLower(parts[0]) != "bearer" {
+			c.JSON(http.StatusUnauthorized, gin.H{"error": "invalid authorization header"})
+			c.Abort()
+			return
+		}
+
+		tokenString := parts[1]
 
 		token, err := jwt.Parse(tokenString, func(t *jwt.Token) (interface{}, error) {
 			return secret, nil
@@ -32,10 +39,21 @@ func AuthMiddleware() gin.HandlerFunc {
 			return
 		}
 
-		claims := token.Claims.(jwt.MapClaims)
-		userID := int(claims["user_id"].(float64))
+		claims, ok := token.Claims.(jwt.MapClaims)
+		if !ok {
+			c.JSON(http.StatusUnauthorized, gin.H{"error": "invalid token claims"})
+			c.Abort()
+			return
+		}
 
-		c.Set("user_id", userID)
+		userIDFloat, ok := claims["user_id"].(float64)
+		if !ok {
+			c.JSON(http.StatusUnauthorized, gin.H{"error": "invalid user id"})
+			c.Abort()
+			return
+		}
+
+		c.Set("user_id", int(userIDFloat))
 		c.Next()
 	}
 }

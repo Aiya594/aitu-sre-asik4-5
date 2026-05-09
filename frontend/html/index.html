@@ -2,59 +2,109 @@
 <html lang="en">
   <head>
     <meta charset="UTF-8" />
-    <title>Microservices Dashboard</title>
-    <link rel="stylesheet" href="styles.css" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>SRE Microservices Dashboard</title>
+    <link rel="stylesheet" href="./styles.css" />
   </head>
 
   <body>
-    <h1>Microservices System Dashboard</h1>
-
-    <div class="container">
-      <!-- AUTH -->
-      <div class="card">
-        <h2>Auth Service</h2>
-
-        <input id="reg_user" placeholder="Register username" />
-        <input id="reg_pass" type="password" placeholder="Register password" />
-        <button onclick="register()">Register</button>
-
-        <hr />
-
-        <input id="log_user" placeholder="Login username" />
-        <input id="log_pass" type="password" placeholder="Login password" />
-        <button onclick="login()">Login</button>
+    <header>
+      <div class="header-left">
+        <h1>SRE Microservices Control Panel</h1>
+        <p>Manage auth, products, orders, payments, and profiles from one dashboard.</p>
       </div>
-
-      <!-- PRODUCTS -->
-      <div class="card">
-        <h2>Product Service</h2>
-
-        <input id="p_name" placeholder="Product name" />
-        <input id="p_price" placeholder="Price" />
-        <input id="p_stock" placeholder="Stock" />
-
-        <button onclick="createProduct()">Create Product</button>
-        <button onclick="getProducts()">Get Products</button>
+      <div class="header-status">
+        <div class="status-pill">Status: <span id="auth-status">Not logged in</span></div>
+        <button id="logout-button" onclick="logout()" class="secondary">Logout</button>
       </div>
+    </header>
 
-      <!-- ORDERS -->
-      <!-- ORDERS -->
-      <div class="card">
-        <h2>Order Service</h2>
+    <main>
+      <section class="grid">
+        <article class="card">
+          <h2>Authentication</h2>
+          <label>Username</label>
+          <input id="log_user" placeholder="Username" />
+          <label>Password</label>
+          <input id="log_pass" type="password" placeholder="Password" />
+          <div class="button-row">
+            <button onclick="login()">Login</button>
+            <button class="secondary" onclick="register()">Register</button>
+          </div>
+        </article>
 
-        <input id="product_id" placeholder="Product ID (NOT name)" />
-        <input id="amount" placeholder="Amount" />
+        <article class="card">
+          <h2>Product Management</h2>
+          <label>Product name</label>
+          <input id="p_name" placeholder="Product name" />
+          <label>Price</label>
+          <input id="p_price" placeholder="Price" type="number" step="0.01" />
+          <label>Stock</label>
+          <input id="p_stock" placeholder="Stock" type="number" />
+          <div class="button-row">
+            <button onclick="createProduct()">Create</button>
+            <button class="secondary" onclick="loadProducts()">Refresh list</button>
+          </div>
+          <div class="list-section">
+            <h3>Products</h3>
+            <select id="product-select" size="5"></select>
+          </div>
+        </article>
 
-        <button onclick="createOrder()">Create Order</button>
-        <button onclick="getOrders()">Get Orders</button>
-      </div>
-    </div>
+        <article class="card">
+          <h2>Order Operations</h2>
+          <label>Product</label>
+          <select id="order-product-select"></select>
+          <label>Quantity</label>
+          <input id="order_amount" type="number" placeholder="Order amount" />
+          <div class="button-row">
+            <button onclick="createOrder()">Create Order</button>
+            <button class="secondary" onclick="loadOrders()">List Orders</button>
+          </div>
+          <div class="list-section">
+            <h3>Order results</h3>
+            <ul id="order-list"></ul>
+          </div>
+        </article>
 
-    <!-- OUTPUT -->
-    <div class="output">
-      <h2>Response</h2>
-      <pre id="output"></pre>
-    </div>
+        <article class="card">
+          <h2>Payments</h2>
+          <label>Order ID</label>
+          <input id="payment_order_id" placeholder="Order ID" />
+          <label>Amount</label>
+          <input id="payment_amount" placeholder="Amount" type="number" step="0.01" />
+          <div class="button-row">
+            <button onclick="processPayment()">Process Payment</button>
+            <button class="secondary" onclick="loadPayments()">Show Payments</button>
+          </div>
+          <div class="list-section">
+            <h3>Payments</h3>
+            <ul id="payment-list"></ul>
+          </div>
+        </article>
+
+        <article class="card full-width">
+          <h2>User Profile</h2>
+          <div class="profile-row">
+            <label>Email</label>
+            <input id="profile_email" placeholder="Email" type="email" />
+            <label>Phone</label>
+            <input id="profile_phone" placeholder="Phone" />
+            <label>Address</label>
+            <input id="profile_address" placeholder="Address" />
+          </div>
+          <div class="button-row">
+            <button onclick="saveProfile()">Save Profile</button>
+            <button class="secondary" onclick="loadProfile()">Load Profile</button>
+          </div>
+        </article>
+      </section>
+
+      <section class="output">
+        <h2>System Output</h2>
+        <pre id="output"></pre>
+      </section>
+    </main>
 
     <script src="app.js"></script>
   </body>
