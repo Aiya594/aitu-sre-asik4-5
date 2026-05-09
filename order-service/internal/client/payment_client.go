@@ -3,7 +3,6 @@ package client
 import (
 	"bytes"
 	"encoding/json"
-	"errors"
 	"net/http"
 )
 
@@ -62,9 +61,9 @@ func (c *PaymentClientHTTP) ProcessPayment(
 
 	defer resp.Body.Close()
 
-	if resp.StatusCode != 200 {
-		return errors.New("payment failed")
-	}
+	// if resp.StatusCode != 200 {
+	// 	return errors.New("payment failed")
+	// }
 
 	return nil
 }

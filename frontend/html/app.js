@@ -1,85 +1,38 @@
-﻿let token = localStorage.getItem("token") || "";
-let currentUserId = null;
+﻿let token = localStorage.getItem("token");
 
+// Base paths (works inside nginx container)
 const API = {
-    auth: "/auth/",
-    orders: "/orders/",
-    products: "/products/",
-    payment: "/payment/",
-    profile: "/profile/",
+    auth: "/auth",
+    orders: "/orders",
+    products: "/products",
+    payments: "/payments",
+    notifications: "/notifications",
+    profiles: "/profiles"
 };
 
 function log(data) {
-    const output = document.getElementById("output");
-    output.textContent = typeof data === "string" ? data : JSON.stringify(data, null, 2);
+    document.getElementById("output").textContent =
+        JSON.stringify(data, null, 2);
 }
 
 function handleError(err) {
     log({ error: err.message || err });
 }
 
-function setAuthState() {
-    const status = document.getElementById("auth-status");
-
-    if (token) {
-        const claims = parseJwt(token);
-        currentUserId = claims?.user_id || null;
-        status.textContent = `Logged in as user ${currentUserId || "unknown"}`;
-        document.getElementById("logout-button").style.display = "inline-flex";
-    } else {
-        currentUserId = null;
-        status.textContent = "Not logged in";
-        document.getElementById("logout-button").style.display = "none";
-    }
-}
-
-function parseJwt(token) {
-    try {
-        const base64Payload = token.split(".")[1];
-        const decodedPayload = atob(base64Payload.replace(/-/g, "+").replace(/_/g, "/"));
-        return JSON.parse(decodeURIComponent(decodedPayload.split("").map(function(c) {
-            return "%" + ("00" + c.charCodeAt(0).toString(16)).slice(-2);
-        }).join("")));
-    } catch (err) {
-        return null;
-    }
-}
-
-async function apiFetch(path, options = {}) {
-    const headers = options.headers || {};
-    if (!headers["Content-Type"]) {
-        headers["Content-Type"] = "application/json";
-    }
-
-    if (token) {
-        headers["Authorization"] = `Bearer ${token}`;
-    }
-
-    const response = await fetch(path, { ...options, headers });
-
-    const contentType = response.headers.get("content-type") || "";
-    const body = contentType.includes("application/json")
-        ? await response.json()
-        : await response.text();
-
-    if (!response.ok) {
-        throw new Error(body?.error || body || `HTTP ${response.status}`);
-    }
-
-    return body;
-}
+// ---------------- AUTH ----------------
 
 async function register() {
     try {
-        const username = document.getElementById("log_user").value;
-        const password = document.getElementById("log_pass").value;
+        const username = document.getElementById("reg_user").value;
+        const password = document.getElementById("reg_pass").value;
 
-        const result = await apiFetch(`${API.auth}register`, {
+        const res = await fetch(`${API.auth}/register`, {
             method: "POST",
-            body: JSON.stringify({ username, password }),
+            headers: {"Content-Type": "application/json"},
+            body: JSON.stringify({ username, password })
         });
 
-        log(result);
+        log(await res.json());
     } catch (err) {
         handleError(err);
     }
@@ -90,221 +43,265 @@ async function login() {
         const username = document.getElementById("log_user").value;
         const password = document.getElementById("log_pass").value;
 
-        const result = await apiFetch(`${API.auth}login`, {
+        const res = await fetch(`${API.auth}/login`, {
             method: "POST",
-            body: JSON.stringify({ username, password }),
+            headers: {"Content-Type": "application/json"},
+            body: JSON.stringify({ username, password })
         });
 
-        if (result.token) {
-            token = result.token;
+        const data = await res.json();
+
+        if (data.token) {
+            token = data.token;
             localStorage.setItem("token", token);
-            setAuthState();
-            log({ status: "Login successful" });
-        } else {
-            log(result);
         }
+
+        log(data);
     } catch (err) {
         handleError(err);
     }
 }
 
-function logout() {
-    token = "";
-    currentUserId = null;
-    localStorage.removeItem("token");
-    setAuthState();
-    log("Logged out");
-}
+// ---------------- PROFILE ----------------
 
-async function loadProducts() {
+async function createProfile() {
+
     try {
-        const products = await apiFetch(`${API.products}products`);
-        renderProductList(products);
-        renderProductOptions(products);
-        log({ products });
+
+        const user_id = parseInt(
+            document.getElementById("profile_user_id").value
+        );
+
+        const email = document.getElementById("profile_email").value;
+
+        const phone = document.getElementById("profile_phone").value;
+
+        const address = document.getElementById("profile_address").value;
+
+        const res = await fetch(`${API.profiles}/profile`, {
+            method: "POST",
+
+            headers: {
+                "Content-Type": "application/json"
+            },
+
+            body: JSON.stringify({
+                user_id,
+                email,
+                phone,
+                address
+            })
+        });
+
+        log(await res.json());
+
     } catch (err) {
+
         handleError(err);
     }
 }
+
+async function getProfile() {
+
+    try {
+
+        const userID = document.getElementById(
+            "profile_get_user_id"
+        ).value;
+
+        const res = await fetch(
+            `${API.profiles}/profile/${userID}`
+        );
+
+        log(await res.json());
+
+    } catch (err) {
+
+        handleError(err);
+    }
+}
+
+async function updateProfile() {
+
+    try {
+
+        const userID = document.getElementById(
+            "profile_update_user_id"
+        ).value;
+
+        const email = document.getElementById(
+            "profile_update_email"
+        ).value;
+
+        const phone = document.getElementById(
+            "profile_update_phone"
+        ).value;
+
+        const address = document.getElementById(
+            "profile_update_address"
+        ).value;
+
+        const res = await fetch(
+            `${API.profiles}/profile/${userID}`,
+            {
+                method: "PUT",
+
+                headers: {
+                    "Content-Type": "application/json"
+                },
+
+                body: JSON.stringify({
+                    email,
+                    phone,
+                    address
+                })
+            }
+        );
+
+        log(await res.json());
+
+    } catch (err) {
+
+        handleError(err);
+    }
+}
+
+// ---------------- PRODUCTS ----------------
 
 async function createProduct() {
     try {
         const name = document.getElementById("p_name").value;
         const price = parseFloat(document.getElementById("p_price").value);
-        const stock = parseInt(document.getElementById("p_stock").value, 10);
+        const stock = parseInt(document.getElementById("p_stock").value);
 
-        const result = await apiFetch(`${API.products}product`, {
+        const res = await fetch(`${API.products}/product`, {
             method: "POST",
-            body: JSON.stringify({ name, price, stock }),
+            headers: {
+                "Content-Type": "application/json"
+            },
+            body: JSON.stringify({ name, price, stock })
         });
 
-        await loadProducts();
-        log(result);
+        log(await res.json());
     } catch (err) {
         handleError(err);
     }
 }
 
-function renderProductList(products) {
-    const select = document.getElementById("product-select");
-    select.innerHTML = "";
-
-    products.forEach((product) => {
-        const option = document.createElement("option");
-        option.value = product.id;
-        option.textContent = `${product.id}: ${product.name} - $${product.price} (${product.stock} in stock)`;
-        select.appendChild(option);
-    });
+async function getProducts() {
+    try {
+        const res = await fetch(`${API.products}/products`);
+        log(await res.json());
+    } catch (err) {
+        handleError(err);
+    }
 }
 
-function renderProductOptions(products) {
-    const select = document.getElementById("order-product-select");
-    select.innerHTML = "";
-
-    products.forEach((product) => {
-        const option = document.createElement("option");
-        option.value = `${product.id}|${product.name}`;
-        option.textContent = `${product.name} [ID ${product.id}]`;
-        select.appendChild(option);
-    });
-}
+// ---------------- ORDERS (FIXED) ----------------
 
 async function createOrder() {
     try {
-        if (!token) {
-            throw new Error("Login required to create an order");
-        }
+        const product_id = parseInt(document.getElementById("product_id").value);
+        const amount = parseFloat(document.getElementById("amount").value);
 
-        const selected = document.getElementById("order-product-select").value;
-        if (!selected) {
-            throw new Error("Choose a product first");
-        }
-
-        const [productId, productName] = selected.split("|");
-        const amount = parseFloat(document.getElementById("order_amount").value);
-
-        const result = await apiFetch(`${API.orders}order`, {
+        const res = await fetch(`${API.orders}/order`, {
             method: "POST",
-            body: JSON.stringify({
-                product_id: parseInt(productId, 10),
-                product_name: productName,
-                amount,
-            }),
+            headers: {
+                "Content-Type": "application/json",
+                "Authorization": "Bearer " + token
+            },
+            body: JSON.stringify({ product_id, amount })
         });
 
-        await loadOrders();
-        log(result);
+        log(await res.json());
     } catch (err) {
         handleError(err);
     }
 }
 
-async function loadOrders() {
+async function getOrders() {
     try {
-        if (!token) {
-            throw new Error("Login required to view orders");
-        }
-
-        const orders = await apiFetch(`${API.orders}orders`, { method: "GET" });
-        const list = document.getElementById("order-list");
-        list.innerHTML = "";
-
-        orders.forEach((order) => {
-            const item = document.createElement("li");
-            item.textContent = `#${order.id}: ${order.product} — ${order.amount}`;
-            list.appendChild(item);
+        const res = await fetch(`${API.orders}/orders`, {
+            headers: {
+                "Authorization": "Bearer " + token
+            }
         });
 
-        log({ orders });
+        log(await res.json());
     } catch (err) {
         handleError(err);
     }
 }
 
-async function processPayment() {
+// ---------------- PAYMENTS ----------------
+
+async function createPayment() {
+
     try {
-        const orderId = document.getElementById("payment_order_id").value;
-        const amount = parseFloat(document.getElementById("payment_amount").value);
 
-        const result = await apiFetch(`/payment/payment`, {
-            method: "POST",
-            body: JSON.stringify({
-                order_id: orderId,
-                user_id: currentUserId || 0,
-                amount,
-            }),
-        });
+        const user_id = parseInt(
+            document.getElementById(
+                "payment_user_id"
+            ).value
+        );
 
-        await loadPayments();
-        log(result);
+        const order_id = parseInt(
+            document.getElementById(
+                "payment_order_id"
+            ).value
+        );
+
+        const amount = parseFloat(
+            document.getElementById(
+                "payment_amount"
+            ).value
+        );
+
+        const res = await fetch(
+            `${API.payments}/payment`,
+            {
+                method: "POST",
+
+                headers: {
+                    "Content-Type":
+                        "application/json"
+                },
+
+                body: JSON.stringify({
+                    user_id,
+                    order_id,
+                    amount
+                })
+            }
+        );
+
+        log(await res.json());
+
     } catch (err) {
+
         handleError(err);
     }
 }
 
-async function loadPayments() {
-    try {
-        const payments = await apiFetch(`/payment/payments`, { method: "GET" });
-        const list = document.getElementById("payment-list");
-        list.innerHTML = "";
 
-        payments.forEach((payment) => {
-            const item = document.createElement("li");
-            item.textContent = `#${payment.id}: order=${payment.order_id} user=${payment.user_id} amount=${payment.amount} status=${payment.status}`;
-            list.appendChild(item);
-        });
+// ---------------- NOTIFICATIONS ----------------
 
-        log({ payments });
-    } catch (err) {
-        handleError(err);
-    }
-}
+// async function getNotifications() {
 
-async function saveProfile() {
-    try {
-        if (!currentUserId) {
-            throw new Error("Login required to save profile");
-        }
+//     try {
 
-        const email = document.getElementById("profile_email").value;
-        const phone = document.getElementById("profile_phone").value;
-        const address = document.getElementById("profile_address").value;
+//         const userID = document.getElementById(
+//             "notification_user_id"
+//         ).value;
 
-        const result = await apiFetch(`${API.profile}`, {
-            method: "POST",
-            body: JSON.stringify({
-                user_id: currentUserId,
-                email,
-                phone,
-                address,
-            }),
-        });
+//         const res = await fetch(
+//             `${API.notifications}/notifications/${userID}`
+//         );
 
-        log(result);
-    } catch (err) {
-        handleError(err);
-    }
-}
+//         log(await res.json());
 
-async function loadProfile() {
-    try {
-        if (!currentUserId) {
-            throw new Error("Login required to load profile");
-        }
+//     } catch (err) {
 
-        const profile = await apiFetch(`${API.profile}${currentUserId}`, { method: "GET" });
-
-        document.getElementById("profile_email").value = profile.email || "";
-        document.getElementById("profile_phone").value = profile.phone || "";
-        document.getElementById("profile_address").value = profile.address || "";
-
-        log(profile);
-    } catch (err) {
-        handleError(err);
-    }
-}
-
-window.addEventListener("load", () => {
-    setAuthState();
-    loadProducts().catch(() => {});
-});
+//         handleError(err);
+//     }
+// }

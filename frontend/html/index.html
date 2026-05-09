@@ -2,110 +2,264 @@
 <html lang="en">
   <head>
     <meta charset="UTF-8" />
-    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>SRE Microservices Dashboard</title>
-    <link rel="stylesheet" href="./styles.css" />
+    <title>Microservices Dashboard</title>
+    <link rel="stylesheet" href="styles.css" />
   </head>
 
   <body>
-    <header>
-      <div class="header-left">
-        <h1>SRE Microservices Control Panel</h1>
-        <p>Manage auth, products, orders, payments, and profiles from one dashboard.</p>
+
+  <header>
+    <div class="header-left">
+      <h1>Microservices System Dashboard</h1>
+      <p>
+        Distributed SRE Infrastructure • Docker • RabbitMQ • Prometheus • Grafana
+      </p>
+    </div>
+
+    <div class="header-status">
+      <div class="status-pill">
+        Environment: Development
       </div>
-      <div class="header-status">
-        <div class="status-pill">Status: <span id="auth-status">Not logged in</span></div>
-        <button id="logout-button" onclick="logout()" class="secondary">Logout</button>
-      </div>
-    </header>
 
-    <main>
-      <section class="grid">
-        <article class="card">
-          <h2>Authentication</h2>
-          <label>Username</label>
-          <input id="log_user" placeholder="Username" />
-          <label>Password</label>
-          <input id="log_pass" type="password" placeholder="Password" />
-          <div class="button-row">
-            <button onclick="login()">Login</button>
-            <button class="secondary" onclick="register()">Register</button>
-          </div>
-        </article>
+      <button class="secondary" onclick="localStorage.clear()">
+        Clear Session
+      </button>
+    </div>
+  </header>
 
-        <article class="card">
-          <h2>Product Management</h2>
-          <label>Product name</label>
-          <input id="p_name" placeholder="Product name" />
-          <label>Price</label>
-          <input id="p_price" placeholder="Price" type="number" step="0.01" />
-          <label>Stock</label>
-          <input id="p_stock" placeholder="Stock" type="number" />
-          <div class="button-row">
-            <button onclick="createProduct()">Create</button>
-            <button class="secondary" onclick="loadProducts()">Refresh list</button>
-          </div>
-          <div class="list-section">
-            <h3>Products</h3>
-            <select id="product-select" size="5"></select>
-          </div>
-        </article>
+  <main>
 
-        <article class="card">
-          <h2>Order Operations</h2>
-          <label>Product</label>
-          <select id="order-product-select"></select>
-          <label>Quantity</label>
-          <input id="order_amount" type="number" placeholder="Order amount" />
-          <div class="button-row">
-            <button onclick="createOrder()">Create Order</button>
-            <button class="secondary" onclick="loadOrders()">List Orders</button>
-          </div>
-          <div class="list-section">
-            <h3>Order results</h3>
-            <ul id="order-list"></ul>
-          </div>
-        </article>
+    <div class="grid">
 
-        <article class="card">
-          <h2>Payments</h2>
-          <label>Order ID</label>
-          <input id="payment_order_id" placeholder="Order ID" />
-          <label>Amount</label>
-          <input id="payment_amount" placeholder="Amount" type="number" step="0.01" />
-          <div class="button-row">
-            <button onclick="processPayment()">Process Payment</button>
-            <button class="secondary" onclick="loadPayments()">Show Payments</button>
-          </div>
-          <div class="list-section">
-            <h3>Payments</h3>
-            <ul id="payment-list"></ul>
-          </div>
-        </article>
+      <!-- AUTH -->
+      <section class="card">
+        <h2>🔐 Authentication Service</h2>
 
-        <article class="card full-width">
-          <h2>User Profile</h2>
-          <div class="profile-row">
-            <label>Email</label>
-            <input id="profile_email" placeholder="Email" type="email" />
-            <label>Phone</label>
-            <input id="profile_phone" placeholder="Phone" />
-            <label>Address</label>
-            <input id="profile_address" placeholder="Address" />
-          </div>
-          <div class="button-row">
-            <button onclick="saveProfile()">Save Profile</button>
-            <button class="secondary" onclick="loadProfile()">Load Profile</button>
-          </div>
-        </article>
+        <label>Register</label>
+
+        <input id="reg_user" placeholder="Username" />
+
+        <input
+          id="reg_pass"
+          type="password"
+          placeholder="Password"
+        />
+
+        <div class="button-row">
+          <button onclick="register()">
+            Register
+          </button>
+        </div>
+
+        <hr />
+
+        <label>Login</label>
+
+        <input id="log_user" placeholder="Username" />
+
+        <input
+          id="log_pass"
+          type="password"
+          placeholder="Password"
+        />
+
+        <div class="button-row">
+          <button onclick="login()">
+            Login
+          </button>
+        </div>
       </section>
 
-      <section class="output">
-        <h2>System Output</h2>
-        <pre id="output"></pre>
-      </section>
-    </main>
+      <!-- PRODUCTS -->
+      <section class="card">
+        <h2>📦 Product Service</h2>
 
-    <script src="app.js"></script>
-  </body>
+        <label>Product Name</label>
+
+        <input id="p_name" placeholder="MacBook Pro" />
+
+        <label>Price</label>
+
+        <input id="p_price" placeholder="2500" />
+
+        <label>Stock</label>
+
+        <input id="p_stock" placeholder="20" />
+
+        <div class="button-row">
+          <button onclick="createProduct()">
+            Create Product
+          </button>
+
+          <button
+            class="secondary"
+            onclick="getProducts()"
+          >
+            Get Products
+          </button>
+        </div>
+      </section>
+
+      <!-- ORDERS -->
+      <section class="card">
+        <h2>🛒 Order Service</h2>
+
+        <label>Product ID</label>
+
+        <input
+          id="product_id"
+          placeholder="1"
+        />
+
+        <label>Amount</label>
+
+        <input
+          id="amount"
+          placeholder="2500"
+        />
+
+        <div class="button-row">
+          <button onclick="createOrder()">
+            Create Order
+          </button>
+
+          <button
+            class="secondary"
+            onclick="getOrders()"
+          >
+            Get Orders
+          </button>
+        </div>
+      </section>
+
+<!-- PAYMENTS -->
+<section class="card">
+
+  <h2>💳 Payment Service</h2>
+
+  <label>User ID</label>
+
+  <input
+    id="payment_user_id"
+    placeholder="1"
+  />
+
+  <label>Order ID</label>
+
+  <input
+    id="payment_order_id"
+    placeholder="101"
+  />
+
+  <label>Amount</label>
+
+  <input
+    id="payment_amount"
+    placeholder="100"
+  />
+
+  <div class="button-row">
+
+    <button onclick="createPayment()">
+      Process Payment
+    </button>
+
+  </div>
+
+</section>
+
+      <!-- PROFILE -->
+      <section class="card">
+        <h2>👤 User Profile Service</h2>
+
+        <label>Create / Update Profile</label>
+
+        <input
+          id="profile_user_id"
+          placeholder="User ID"
+        />
+
+        <input
+          id="profile_email"
+          placeholder="Email"
+        />
+
+        <input
+          id="profile_phone"
+          placeholder="Phone"
+        />
+
+        <input
+          id="profile_address"
+          placeholder="Address"
+        />
+
+        <div class="button-row">
+          <button onclick="createProfile()">
+            Create Profile
+          </button>
+
+          <button
+            class="secondary"
+            onclick="updateProfile()"
+          >
+            Update Profile
+          </button>
+        </div>
+
+        <hr />
+
+        <label>Get Profile</label>
+
+        <input
+          id="profile_get_user_id"
+          placeholder="User ID"
+        />
+
+        <div class="button-row">
+          <button
+            class="secondary"
+            onclick="getProfile()"
+          >
+            Get Profile
+          </button>
+        </div>
+      </section>
+
+      <!-- NOTIFICATIONS -->
+      <!-- <section class="card">
+        <h2>📨 Notification Service</h2>
+
+        <label>User ID</label>
+
+        <input
+          id="notification_user_id"
+          placeholder="1"
+        />
+
+        <div class="button-row">
+          <button onclick="getNotifications()">
+            Get Notifications
+          </button>
+        </div>
+      </section> -->
+
+      <!-- OUTPUT -->
+      <section class="card full-width">
+        <h2>📄 API Response</h2>
+
+        <pre id="output">
+Ready...
+        </pre>
+      </section>
+
+    </div>
+
+  </main>
+
+  <script src="app.js"></script>
+
+</body>
+
+ 
 </html>
