@@ -21,6 +21,9 @@ variable "services" {
     auth_port  = number
     order_port = number
     product_port = number
+    user_profile_port = number 
+    payment_port = number
+    notification_port = number
   })
 }
 
@@ -47,16 +50,36 @@ variable "network" {
   }
 }
 
+# rabbitmq
+variable "rabbitmq" {
+  type = object({
+    user     = string
+    password = string
+  })
+
+  default = {
+    user     = "guest"
+    password = "guest"
+  }
+}
+
 # Scaling configuration
 variable "scaling" {
   type = object({
-    auth_replicas    = number
-    order_replicas   = number
-    product_replicas = number
+    auth_replicas         = number
+    order_replicas        = number
+    product_replicas      = number
+    payment_replicas      = number
+    user_profile_replicas = number
+    notification_replicas = number
   })
+
   default = {
-    auth_replicas    = 1
-    order_replicas   = 2  # Order service is resource-intensive
-    product_replicas = 1
+    auth_replicas         = 1
+    order_replicas        = 1
+    product_replicas      = 1
+    payment_replicas      = 1
+    user_profile_replicas = 1
+    notification_replicas = 1
   }
 }

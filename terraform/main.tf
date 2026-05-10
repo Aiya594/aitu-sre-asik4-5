@@ -40,7 +40,7 @@ resource "docker_container" "postgres" {
 # AUTH SERVICE
 # =========================
 resource "docker_container" "auth" {
-  count=var.scaling.auth_replicas
+  # count=var.scaling.auth_replicas
 
   name  = "auth-service"
   image = "auth-service:latest"
@@ -70,7 +70,7 @@ resource "docker_container" "auth" {
 # ORDER SERVICE
 # =========================
 resource "docker_container" "order" {
-  count=var.scaling.order_replicas
+  # count=var.scaling.order_replicas
 
 
   name  = "order-service"
@@ -83,7 +83,9 @@ resource "docker_container" "order" {
     "DB_NAME=${var.database.name}",
     "DB_MODE=${var.database.mode}",
     "DB_PORT=${var.database.port}",
-    "PRODUCT_SERVICE_URL=http://product-service:8082"
+    "PRODUCT_SERVICE_URL=http://product-service:8082",
+    "PAYMENT_SERVICE_URL=http://payment-service:8083",
+    "RABBITMQ_URL=amqp://guest:guest@rabbitmq:5672/"
   ]
 
   ports {
@@ -102,7 +104,7 @@ resource "docker_container" "order" {
 # PRODUCT SERVICE
 # =========================
 resource "docker_container" "product" {
-  count=var.scaling.product_replicas
+  # count=var.scaling.product_replicas
 
 
   name  = "product-service"
@@ -127,6 +129,105 @@ resource "docker_container" "product" {
   }
 
   depends_on = [docker_container.postgres]
+}
+
+# =========================
+# PROFILE
+# =========================
+
+resource "docker_container" "profile" {
+  # count = var.scaling.user_profile_replicas
+
+  name  = "profile-service"
+  image = "profile-service:latest"
+
+  env = [
+    "DB_HOST=${var.database.host}",
+    "DB_USER=${var.database.user}",
+    "DB_PASSWORD=${var.database.password}",
+    "DB_NAME=${var.database.name}",
+    "DB_MODE=${var.database.mode}",
+    "DB_PORT=${var.database.port}"
+  ]
+
+  ports {
+    internal = var.services.user_profile_port
+    external = var.services.user_profile_port 
+  }
+
+  networks_advanced {
+    name = docker_network.app_network.name
+  }
+
+  depends_on = [
+    docker_container.postgres
+  ]
+}
+
+# =========================
+# PAYMENT
+# =========================
+resource "docker_container" "payment" {
+  # count = var.scaling.payment_replicas
+
+  name  = "payment-service"
+  image = "payment-service:latest"
+
+  env = [
+    "DB_HOST=${var.database.host}",
+    "DB_USER=${var.database.user}",
+    "DB_PASSWORD=${var.database.password}",
+    "DB_NAME=${var.database.name}",
+    "DB_MODE=${var.database.mode}",
+    "DB_PORT=${var.database.port}"
+  ]
+
+  ports {
+    internal = var.services.payment_port
+    external = var.services.payment_port 
+  }
+
+  networks_advanced {
+    name = docker_network.app_network.name
+  }
+
+  depends_on = [
+    docker_container.postgres
+  ]
+}
+
+# =========================
+# NOTIFICATION
+# =========================
+
+resource "docker_container" "notification" {
+  # count = var.scaling.notification_replicas
+
+  name  = "notification-service"
+  image = "notification-service:latest"
+
+  env = [
+    "DB_HOST=${var.database.host}",
+    "DB_USER=${var.database.user}",
+    "DB_PASSWORD=${var.database.password}",
+    "DB_NAME=notificationdb",
+    "DB_PORT=${var.database.port}",
+    "RABBITMQ_URL=amqp://${var.rabbitmq.user}:${var.rabbitmq.password}@rabbitmq:5672/"
+  ]
+
+  ports {
+    internal = var.services.notification_port
+    external = var.services.notification_port
+  }
+
+  networks_advanced {
+    name = docker_network.app_network.name
+  }
+
+  depends_on = [
+    docker_container.postgres,
+    docker_container.rabbitmq
+  ]
 }
 
 # =========================
@@ -188,6 +289,41 @@ resource "docker_container" "nginx" {
   volumes {
     host_path      = abspath("${path.module}/../frontend/nginx.conf")
     container_path = "/etc/nginx/nginx.conf"
+  }
+
+  depends_on = [
+    docker_container.auth,
+    docker_container.order,
+    docker_container.product,
+    docker_container.payment,
+    docker_container.profile
+  ]
+
+  networks_advanced {
+    name = docker_network.app_network.name
+  }
+}
+
+# =========================
+# RABBITMQ
+# =========================
+resource "docker_container" "rabbitmq" {
+  name  = "rabbitmq"
+  image = "rabbitmq:3-management"
+
+  env = [
+    "RABBITMQ_DEFAULT_USER=${var.rabbitmq.user}",
+    "RABBITMQ_DEFAULT_PASS=${var.rabbitmq.password}"
+  ]
+
+  ports {
+    internal = 5672
+    external = 5672
+  }
+
+  ports {
+    internal = 15672
+    external = 15672
   }
 
   networks_advanced {
