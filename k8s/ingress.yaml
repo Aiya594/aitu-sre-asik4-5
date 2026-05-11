@@ -1,0 +1,101 @@
+apiVersion: networking.k8s.io/v1
+kind: Ingress
+
+metadata:
+  name: app-ingress
+
+spec:
+  rules:
+  - http:
+      paths:
+
+      # =========================
+      # FRONTEND
+      # =========================
+      - path: /
+        pathType: Prefix
+
+        backend:
+          service:
+            name: nginx
+
+            port:
+              number: 5000
+
+      # =========================
+      # AUTH
+      # =========================
+      - path: /auth
+        pathType: Prefix
+
+        backend:
+          service:
+            name: auth-service
+
+            port:
+              number: 8080
+
+      # =========================
+      # PRODUCTS
+      # =========================
+      - path: /products
+        pathType: Prefix
+
+        backend:
+          service:
+            name: product-service
+
+            port:
+              number: 8082
+
+      # =========================
+      # ORDERS
+      # =========================
+      - path: /orders
+        pathType: Prefix
+
+        backend:
+          service:
+            name: order-service
+
+            port:
+              number: 8081
+
+      # =========================
+      # PAYMENTS
+      # =========================
+      - path: /payments
+        pathType: Prefix
+
+        backend:
+          service:
+            name: payment-service
+
+            port:
+              number: 8083
+
+      # =========================
+      # NOTIFICATIONS
+      # =========================
+      - path: /notifications
+        pathType: Prefix
+
+        backend:
+          service:
+            name: notification-service
+
+            port:
+              number: 8084
+
+      # =========================
+      # PROFILE
+      # =========================
+      - path: /profile
+        pathType: Prefix
+
+        backend:
+          service:
+            name: profile-service
+
+            port:
+              number: 8085

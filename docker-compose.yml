@@ -97,12 +97,12 @@ services:
     env_file:
       - ./notification-service/.env
     environment:
-      DB_HOST: postgres
+      DB_HOST: ${DB_HOST}
       DB_USER: ${DB_USER}
       DB_PASSWORD: ${DB_PASSWORD}
-      DB_NAME: notificationdb
+      DB_NAME: ${DB_NAME}
       DB_PORT: ${DB_PORT}
-      RABBITMQ_URL: ${RABBIT_MQ_URL}
+      RABBITMQ_URL: ${RABBITMQ_URL}
     depends_on:
       postgres:
         condition: service_healthy
@@ -131,7 +131,7 @@ services:
       - DB_MODE=${DB_MODE}
       - DB_PORT=${DB_PORT}
       - PRODUCT_SERVICE_URL=${PRODUCT_SERVICE_URL}
-      - RABBITMQ_URL=${RABBIT_MQ_URL}
+      - RABBITMQ_URL=${RABBITMQ_URL}
     healthcheck:
       test: ["CMD", "curl", "-f",  "http://order-service:8081/health"]
       interval: 10s

@@ -1,0 +1,48 @@
+apiVersion: apps/v1
+kind: Deployment
+
+metadata:
+  name: product-service
+
+spec:
+  replicas: 2
+
+  selector:
+    matchLabels:
+      app: product-service
+
+  template:
+    metadata:
+      labels:
+        app: product-service
+
+    spec:
+      containers:
+      - name: product-service
+
+        image: product-service:latest
+        imagePullPolicy: Never
+
+        ports:
+        - containerPort: 8082
+
+        envFrom:
+        - configMapRef:
+            name: app-config
+
+        - secretRef:
+            name: app-secret
+
+        livenessProbe:
+          httpGet:
+            path: /health
+            port: 8082
+
+          initialDelaySeconds: 10
+
+        readinessProbe:
+          httpGet:
+            path: /health
+            port: 8082
+
+          initialDelaySeconds: 5
