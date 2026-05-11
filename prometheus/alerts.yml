@@ -1,38 +1,90 @@
 groups:
-  - name: service_alerts
-    rules:
-      - alert: HighCPUUsage
-        expr: rate(process_cpu_user_seconds_total[5m]) > 0.8
-        for: 2m
-        labels:
-          severity: warning
-        annotations:
-          summary: "High CPU usage detected"
-          description: "CPU usage is above 80% for more than 2 minutes"
 
-      - alert: ServiceDown
-        expr: up == 0
-        for: 1m
-        labels:
-          severity: critical
-        annotations:
-          summary: "Service is down"
-          description: "Service {{ $labels.job }} is not responding"
+- name: service_alerts
+  rules:
+  # SERVICE DOWN
+  - alert: ServiceDown
+    expr: up == 0
+    for: 1m
+    labels:
+      severity: critical
+    annotations:
+      summary: "Service is down"
+      description: "Service {{ $labels.job }} is not responding"
 
-      - alert: HighErrorRate
-        expr: rate(http_requests_total{status=~"5.."}[5m]) / rate(http_requests_total[5m]) > 0.1
-        for: 2m
-        labels:
-          severity: warning
-        annotations:
-          summary: "High error rate"
-          description: "Error rate is above 10% for more than 2 minutes"
+  # HIGH ERROR RATE
+  - alert: HighErrorRate
+    expr: |
+      (
+        rate(http_requests_total{status=~"5.."}[5m])
+        /
+        rate(http_requests_total[5m])
+      ) > 0.1
 
-      - alert: ContainerRestart
-        expr: increase(container_last_seen[5m]) > 0
-        for: 1m
-        labels:
-          severity: info
-        annotations:
-          summary: "Container restarted"
-          description: "Container {{ $labels.name }} has restarted"
+    for: 2m
+    labels:
+      severity: warning
+    annotations:
+      summary: "High error rate"
+      description: "Error rate is above 10% for {{ $labels.job }}"
+
+  # HIGH LATENCY
+  - alert: HighLatency
+    expr: |
+      histogram_quantile(
+        0.95,
+        rate(http_request_duration_seconds_bucket[5m])
+      ) > 0.2
+    for: 2m
+    labels:
+      severity: warning
+    annotations:
+      summary: "High latency detected"
+      description: "95th percentile latency exceeds 200ms"
+
+  # LOW AVAILABILITY
+  - alert: LowAvailability
+    expr: |
+      (
+        sum(rate(http_requests_total{status!~"5.."}[5m]))
+        /
+        sum(rate(http_requests_total[5m]))
+      ) < 0.99
+    for: 5m
+    labels:
+      severity: critical
+    annotations:
+      summary: "Availability below SLO"
+      description: "Availability dropped below 99%"
+
+# RESOURCE ALERTS
+- name: resource_alerts
+  rules:
+  # HIGH CPU
+  - alert: HighCPUUsage
+    expr: |
+      rate(process_cpu_seconds_total[5m]) > 0.8
+    for: 2m
+    labels:
+      severity: warning
+    annotations:
+      summary: "High CPU usage"
+      description: "CPU usage above 80%"
+
+  # HIGH MEMORY
+  - alert: HighMemoryUsage
+
+    expr: |
+      process_resident_memory_bytes
+      /
+      1024 / 1024 > 500
+
+    for: 2m
+
+    labels:
+      severity: warning
+
+    annotations:
+      summary: "High memory usage"
+      description: "Memory usage above 500MB"
+

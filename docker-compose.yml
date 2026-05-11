@@ -213,6 +213,9 @@ services:
     networks:
       - app-network
     restart: unless-stopped
+    volumes:
+    - ./grafana/provisioning:/etc/grafana/provisioning
+    - ./grafana/dashboards:/var/lib/grafana/dashboards
 
   rabbitmq:
     image: rabbitmq:3-management
