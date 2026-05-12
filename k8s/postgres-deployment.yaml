@@ -39,4 +39,16 @@ spec:
               key: DB_PASSWORD
 
         - name: POSTGRES_DB
-          value: app
+          valueFrom:
+            configMapKeyRef:
+              name: app-config
+              key: DB_NAME
+
+        volumeMounts:
+        - name: postgres-initdb
+          mountPath: /docker-entrypoint-initdb.d
+
+      volumes:
+      - name: postgres-initdb
+        configMap:
+          name: postgres-init-script

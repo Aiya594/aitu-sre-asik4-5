@@ -2,88 +2,125 @@
 
   tasks:
 
-  
   # START MINIKUBE
-  
 
   - name: Start Minikube
     shell: |
       minikube start --driver=docker
 
-  
+
   # ENABLE INGRESS
-  
 
   - name: Enable ingress
     shell: |
       minikube addons enable ingress
 
-  
+
   # BUILD AUTH IMAGE
-  
 
   - name: Build auth-service image
     shell: |
       docker build -t auth-service:latest ../auth-service
 
-  
+  - name: Load auth-service image
+    shell: |
+      minikube image load auth-service:latest
+
+
   # BUILD PRODUCT IMAGE
-  
 
   - name: Build product-service image
     shell: |
       docker build -t product-service:latest ../product-service
 
-  
+  - name: Load product-service image
+    shell: |
+      minikube image load product-service:latest
+
+
   # BUILD ORDER IMAGE
-  
 
   - name: Build order-service image
     shell: |
       docker build -t order-service:latest ../order-service
 
-  
+  - name: Load order-service image
+    shell: |
+      minikube image load order-service:latest
+
+
   # BUILD PAYMENT IMAGE
-  
 
   - name: Build payment-service image
     shell: |
       docker build -t payment-service:latest ../payment-service
 
-  
+  - name: Load payment-service image
+    shell: |
+      minikube image load payment-service:latest
+
+
   # BUILD PROFILE IMAGE
 
   - name: Build profile-service image
     shell: |
       docker build -t profile-service:latest ../user-profile-service
 
-  
+  - name: Load profile-service image
+    shell: |
+      minikube image load profile-service:latest
+
+
   # BUILD NOTIFICATION IMAGE
-  
 
   - name: Build notification-service image
     shell: |
       docker build -t notification-service:latest ../notification-service
 
-  
+  - name: Load notification-service image
+    shell: |
+      minikube image load notification-service:latest
+
+
   # BUILD FRONTEND IMAGE
-  
 
   - name: Build frontend image
     shell: |
       docker build -t frontend-nginx:latest ../frontend
 
-  
-  # DEPLOY K8S FILES
-  
+  - name: Load frontend image
+    shell: |
+      minikube image load frontend-nginx:latest
+
+
+  # APPLY KUBERNETES FILES
 
   - name: Apply Kubernetes manifests
     shell: |
       kubectl apply -f ../k8s/
 
-  
+
+  # RESTART DEPLOYMENTS
+
+  - name: Restart deployments
+    shell: |
+      kubectl rollout restart deployment auth-service
+      kubectl rollout restart deployment product-service
+      kubectl rollout restart deployment order-service
+      kubectl rollout restart deployment payment-service
+      kubectl rollout restart deployment profile-service
+      kubectl rollout restart deployment notification-service
+      kubectl rollout restart deployment nginx
+
+
+  # WAIT A LITTLE
+
+  - name: Wait for pods
+    pause:
+      seconds: 20
+
+
   # VERIFY PODS
-  
 
   - name: Get pods
     shell: |
@@ -93,9 +130,8 @@
   - debug:
       var: pod_output.stdout
 
-  
+
   # VERIFY SERVICES
-  
 
   - name: Get services
     shell: |
