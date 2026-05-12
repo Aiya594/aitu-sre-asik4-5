@@ -9,9 +9,9 @@ spec:
   - http:
       paths:
 
-      # =========================
+      
       # FRONTEND
-      # =========================
+      
       - path: /
         pathType: Prefix
 
@@ -22,9 +22,9 @@ spec:
             port:
               number: 80
 
-      # =========================
+      
       # AUTH
-      # =========================
+      
       - path: /auth
         pathType: Prefix
 
@@ -35,9 +35,9 @@ spec:
             port:
               number: 8080
 
-      # =========================
+      
       # PRODUCTS
-      # =========================
+      
       - path: /products
         pathType: Prefix
 
@@ -48,9 +48,9 @@ spec:
             port:
               number: 8082
 
-      # =========================
+      
       # ORDERS
-      # =========================
+      
       - path: /orders
         pathType: Prefix
 
@@ -61,9 +61,9 @@ spec:
             port:
               number: 8081
 
-      # =========================
+      
       # PAYMENTS
-      # =========================
+      
       - path: /payments
         pathType: Prefix
 
@@ -74,9 +74,9 @@ spec:
             port:
               number: 8083
 
-      # =========================
+      
       # NOTIFICATIONS
-      # =========================
+      
       - path: /notifications
         pathType: Prefix
 
@@ -87,9 +87,9 @@ spec:
             port:
               number: 8084
 
-      # =========================
+      
       # PROFILE
-      # =========================
+      
       - path: /profile
         pathType: Prefix
 

@@ -2,89 +2,88 @@
 
   tasks:
 
-  # =========================
+  
   # START MINIKUBE
-  # =========================
+  
 
   - name: Start Minikube
     shell: |
       minikube start --driver=docker
 
-  # =========================
+  
   # ENABLE INGRESS
-  # =========================
+  
 
   - name: Enable ingress
     shell: |
       minikube addons enable ingress
 
-  # =========================
+  
   # BUILD AUTH IMAGE
-  # =========================
+  
 
   - name: Build auth-service image
     shell: |
       docker build -t auth-service:latest ../auth-service
 
-  # =========================
+  
   # BUILD PRODUCT IMAGE
-  # =========================
+  
 
   - name: Build product-service image
     shell: |
       docker build -t product-service:latest ../product-service
 
-  # =========================
+  
   # BUILD ORDER IMAGE
-  # =========================
+  
 
   - name: Build order-service image
     shell: |
       docker build -t order-service:latest ../order-service
 
-  # =========================
+  
   # BUILD PAYMENT IMAGE
-  # =========================
+  
 
   - name: Build payment-service image
     shell: |
       docker build -t payment-service:latest ../payment-service
 
-  # =========================
+  
   # BUILD PROFILE IMAGE
-  # =========================
 
   - name: Build profile-service image
     shell: |
       docker build -t profile-service:latest ../user-profile-service
 
-  # =========================
+  
   # BUILD NOTIFICATION IMAGE
-  # =========================
+  
 
   - name: Build notification-service image
     shell: |
       docker build -t notification-service:latest ../notification-service
 
-  # =========================
+  
   # BUILD FRONTEND IMAGE
-  # =========================
+  
 
   - name: Build frontend image
     shell: |
       docker build -t frontend-nginx:latest ../frontend
 
-  # =========================
+  
   # DEPLOY K8S FILES
-  # =========================
+  
 
   - name: Apply Kubernetes manifests
     shell: |
       kubectl apply -f ../k8s/
 
-  # =========================
+  
   # VERIFY PODS
-  # =========================
+  
 
   - name: Get pods
     shell: |
@@ -94,9 +93,9 @@
   - debug:
       var: pod_output.stdout
 
-  # =========================
+  
   # VERIFY SERVICES
-  # =========================
+  
 
   - name: Get services
     shell: |
